@@ -12,7 +12,7 @@ clean:
 
 
 install: all
-	$(INSTALL) -D stun-c $(DESTDIR)$(BINDIR)/stun
+	$(INSTALL) -D stun-c $(DESTDIR)$(BINDIR)/stun-c
 
 stun-c:
 	$(CC) stun.c -o stun-c -lpthread
