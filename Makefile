@@ -4,15 +4,15 @@ BINDIR=$(PREFIX)/bin
 CC=gcc
 INSTALL=ginstall
 
-all:	stun
+all:	stun-c
 distclean:	clean
 
 clean:
-	rm stun
+	rm stun-c
 
 
 install: all
-	$(INSTALL) -D stun $(DESTDIR)$(BINDIR)/stun
+	$(INSTALL) -D stun-c $(DESTDIR)$(BINDIR)/stun
 
-stun:
-	$(CC) stun.c -o stun -lpthread
+stun-c:
+	$(CC) stun.c -o stun-c -lpthread
