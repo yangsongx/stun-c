@@ -1,3 +1,28 @@
+#ifndef _STUN_DEF_H
+#define _STUN_DEF_H
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+#include <unistd.h>
+
+#define STUNPORT  3478
+
+// mask
+#define STUN_TEST_I   0x01
+#define STUN_TEST_II  0x02
+#define STUN_TEST_III 0x04
+
+/**
+ * Msg Header(20-byte), Page 25, RFC 3489
+ */
 struct stun_header {
 	unsigned short msgtype;
 	unsigned short msglen;
@@ -5,6 +30,9 @@ struct stun_header {
 	unsigned char ies[0];
 } __attribute__((packed));
 
+/**
+ * Msg Attribute(TLV, variant len), Page 26, RFC 3489
+ */
 struct stun_attr {
 	unsigned short attr;
 	unsigned short len;
@@ -50,3 +78,5 @@ struct stun_state {
 #define STUN_REFLECTED_FROM   0x000b
 #define STUN_XOR_MAPPED_ADDRESS 0x0020
 #define STUN_SERVERNAME    0x0022
+
+#endif

@@ -2,17 +2,21 @@ PREFIX=/usr
 BINDIR=$(PREFIX)/bin
 
 CC=gcc
-INSTALL=ginstall
+SRC=stun.c another_method.c
 
-all:	stun-c
-distclean:	clean
+OBJS=$(SRC:.c=.o)
 
+CFLAGS = -c -g -O0 -W -Wall -Wunused-parameter
+LDFLAGS = -pthread
+
+all:stun
+
+stun:$(OBJS)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+.c.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+.PHONY:clean
 clean:
-	rm stun-c
-
-
-install: all
-	$(INSTALL) -D stun-c $(DESTDIR)$(BINDIR)/stun-c
-
-stun-c:
-	$(CC) stun.c -o stun-c -lpthread
+	rm *.o stun

@@ -362,7 +362,16 @@ void stun_handle_packet(struct stun_state *st,struct sockaddr_in *src, void *buf
 	return;
 }
 
+/* TODO need add a list server here */
+static char stun_server_list[] = "stun.voxgratia.org";
+
 int main(int argc, char *argv[]) {
+#if 1
+    int ret;
+
+    ret = get_nat_type(stun_server_list);
+#else
+    unsigned int number_ip;
 	struct hostent *hp;
 	int flags;
 	struct timeval tv;
@@ -373,9 +382,26 @@ int main(int argc, char *argv[]) {
 	gettimeofday(&tv, 0);
 	srandom(tv.tv_sec + tv.tv_usec);
 
-	hp=gethostbyname(argv[1]);
+	hp = gethostbyname(stun_server_list);
+    if(!hp)
+    {
+        printf("failed do DNS for %s(%d)\n", stun_server_list, errno);
+        exit(-1);
+    }
+
+    number_ip = *(int *)hp->h_addr_list[0];
+    printf("myflags=%#x\n", number_ip);
+    printf("the sizeof(stunserver.sin_addr) = %d\n", sizeof(stunserver.sin_addr));
+    printf("%s ==> %d.%d.%d.%d\n",
+            stun_server_list, number_ip & 0xff,
+            (number_ip& 0xff00) >> 8,
+            (number_ip& 0xff0000) >> 16,
+            (number_ip& 0xff000000) >> 24);
+
+    printf("\n\n");
+
 	memcpy(&stunserver.sin_addr, hp->h_addr, sizeof(stunserver.sin_addr));
-	stunserver.sin_port = htons(3478);
+	stunserver.sin_port = htons(STUNPORT);
 
 	st.sock=socket(PF_INET,SOCK_DGRAM,0);
 	flags = fcntl(st.sock, F_GETFL);
@@ -411,6 +437,6 @@ int main(int argc, char *argv[]) {
 	}
 	pthread_attr_destroy(&attr);
 	shutdown(st.sock,SHUT_RDWR);
-
 	exit(0);
+#endif
 }
