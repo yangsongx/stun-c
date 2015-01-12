@@ -15,10 +15,9 @@
 
 #define STUNPORT  3478
 
-// mask
 #define STUN_TEST_I   0x01
 #define STUN_TEST_II  0x02
-#define STUN_TEST_III 0x04
+#define STUN_TEST_III 0x03
 
 /**
  * Msg Header(20-byte), Page 25, RFC 3489
