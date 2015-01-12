@@ -15,6 +15,8 @@ static unsigned char transaction_id[16] = {
 unsigned int stun_steps_mask = 0;
 //unsigned int finished_steps  = 0;
 
+static int    ms = (DEFAULT_TIMEOUT*1000); /* time wait(millisecond unit)  during UDP sending */
+
 char *output_stun_hdrtype(struct stun_header *hdr)
 {
     switch(hdr->msgtype)
@@ -156,6 +158,19 @@ int test_I(int udp_s, struct sockaddr *stun_addr)
  */
 int test_II(int udp_s, struct sockaddr *stun_addr)
 {
+    struct stun_attr *attr;
+    memset(packet_data, 0x00, sizeof(packet_data));
+    hdr = (struct stun_header *)packet_data;
+    hdr->msgtype = htons(STUN_BINDREQ);  // be note it's in network endian!
+    hdr->msglen = htons(8);
+    gen_transaction_id((unsigned char *)hdr->id);
+
+    assert(sizeof(struct stun_header) == 20);
+    /* set CHANGE IP and CHANGE Port flags */
+    attr = (struct stun_attr *) (packet_data + sizeof(struct stun_header));
+    attr->attr = ntohs(STUN_CHANGE_REQUEST);
+    attr->len = ntohs(4);
+
     return 0;
 }
 
@@ -221,7 +236,6 @@ int get_nat_type(const char *stun_server)
     struct sockaddr_in stunserver_addr;
     struct timeval timeout;
     int    type;
-    int    ms = (DEFAULT_TIMEOUT*1000); /* time wait(millisecond unit)  during UDP sending */
 
     udp_sock = socket(AF_INET, SOCK_DGRAM, 0);
     if(udp_sock == -1)
