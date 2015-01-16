@@ -158,6 +158,7 @@ int test_I(int udp_s, struct sockaddr *stun_addr)
  */
 int test_II(int udp_s, struct sockaddr *stun_addr)
 {
+    struct stun_header *hdr;
     struct stun_attr *attr;
     memset(packet_data, 0x00, sizeof(packet_data));
     hdr = (struct stun_header *)packet_data;
@@ -236,6 +237,8 @@ int get_nat_type(const char *stun_server)
     struct sockaddr_in stunserver_addr;
     struct timeval timeout;
     int    type;
+    struct sockaddr_in local_addr;
+    socklen_t  local_addr_len = 0;
 
     udp_sock = socket(AF_INET, SOCK_DGRAM, 0);
     if(udp_sock == -1)
@@ -245,6 +248,15 @@ int get_nat_type(const char *stun_server)
     }
 
     printf("=== UDP Socket Created (%d)\n", udp_sock);
+    if(getsockname(udp_sock, &local_addr, &local_addr_len) == 0)
+    {
+        printf("the local addr:, port:%d\n", ntohs(local_addr.sin_port));
+    }
+    else
+    {
+        printf("*** failed call getsockname() :%d\n", errno);
+    }
+
 	ht = gethostbyname(stun_server);
     if(!ht)
     {
@@ -266,6 +278,14 @@ int get_nat_type(const char *stun_server)
     stunserver_addr.sin_port = htons(STUNPORT);
 
     test_I(udp_sock, (struct sockaddr *)&stunserver_addr);
+    if(getsockname(udp_sock, &local_addr, &local_addr_len) == 0)
+    {
+        printf("the local addr:, port:%d\n", ntohs(local_addr.sin_port));
+    }
+    else
+    {
+        printf("*** failed call getsockname() :%d\n", errno);
+    }
 
     while(1) {
         FD_ZERO(&read_fds);
